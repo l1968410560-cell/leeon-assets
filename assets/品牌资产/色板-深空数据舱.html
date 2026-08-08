@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>leeon 色板 · 深空数据舱</title>
+<style>
+  body { background:#05060B; color:#E8EAED; font-family:"Microsoft YaHei",sans-serif; margin:0; padding:48px; }
+  h1 { font-size:28px; letter-spacing:2px; margin:0 0 8px; }
+  .sub { color:#8A8F9C; font-size:13px; margin-bottom:40px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .card { border:1px solid rgba(255,255,255,.12); border-radius:12px; overflow:hidden; background:rgba(255,255,255,.02); }
+  .swatch { height:120px; }
+  .info { padding:12px 14px; }
+  .name { font-size:14px; font-weight:bold; }
+  .hex { font-family:"JetBrains Mono",Consolas,monospace; font-size:12px; color:#8A8F9C; margin-top:4px; }
+  .use { font-size:12px; color:#B9BEC9; margin-top:6px; }
+</style>
+</head>
+<body>
+  <h1>LEEON · 深空数据舱 色板</h1>
+  <div class="sub">全平台视觉基准 · 近黑 + 灰白 + 一青，≤3 色</div>
+  <div class="grid">
+    <div class="card"><div class="swatch" style="background:#05060B"></div><div class="info"><div class="name">近黑底</div><div class="hex">#05060B</div><div class="use">主背景（不纯黑）</div></div></div>
+    <div class="card"><div class="swatch" style="background:#E8EAED"></div><div class="info"><div class="name">暖白</div><div class="hex">#E8EAED</div><div class="use">正文 / 次级文字</div></div></div>
+    <div class="card"><div class="swatch" style="background:#22D3EE"></div><div class="info"><div class="name">强调青</div><div class="hex">#22D3EE</div><div class="use">数字 / 结论 / 进度条</div></div></div>
+    <div class="card"><div class="swatch" style="background:#3A3F4A"></div><div class="info"><div class="name">灰阶辅助</div><div class="hex">#3A3F4A</div><div class="use">分隔线 / 弱化元素</div></div></div>
+    <div class="card"><div class="swatch" style="background:rgba(255,255,255,.12)"></div><div class="info"><div class="name">半透明边框</div><div class="hex">white 10-14%</div><div class="use">卡片描边</div></div></div>
+    <div class="card"><div class="swatch" style="background:#0B1220"></div><div class="info"><div class="name">卡片底色</div><div class="hex">#0B1220</div><div class="use">次级面板 / 代码块</div></div></div>
+  </div>
+</body>
+</html>
