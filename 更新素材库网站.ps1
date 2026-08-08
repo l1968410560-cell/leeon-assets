@@ -4,6 +4,8 @@ $site = "D:\AI\codex\projects\leeon账号运营\leeon\素材库网站"
 
 Push-Location $site
 try {
+    git config http.proxy http://127.0.0.1:10809
+
     Write-Host "[1/3] 重建 index.html ..." -ForegroundColor Cyan
     python build_site.py
     if ($LASTEXITCODE -ne 0) { throw "build_site.py 失败" }
