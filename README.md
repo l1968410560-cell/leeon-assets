@@ -7,6 +7,8 @@
 - 仓库页（GitHub Pages）：https://l1968410560-cell.github.io/leeon-assets/
 - 本地文件：`leeon/素材库网站/index.html`（双击打开）
 
+> 提示：`index.html` 是**单文件自包含版**（SVG 内嵌、PNG 以 base64 内嵌），任何浏览器打开都无需联网读取本地资源；字体在线预览、离线时回退系统字体。
+
 ## 包含内容
 
 | 分类 | 数量 | 来源 / 许可 |

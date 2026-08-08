@@ -4,6 +4,7 @@
 扫描 素材库/ 与 模板库/，同步资源到 assets/，生成自包含 index.html。
 新增素材后重新运行本脚本即可。
 """
+import base64
 import html
 import re
 import shutil
@@ -27,6 +28,35 @@ def read_svg(p: Path) -> str:
         return p.read_text(encoding="utf-8", errors="replace")
     except Exception:
         return ""
+
+
+def clean_svg(svg: str) -> str:
+    svg = re.sub(r"<!--.*?-->", "", svg, flags=re.S)
+    return re.sub(r"\s+", " ", svg).strip()
+
+
+def png_uri(p: Path) -> str:
+    return "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode("ascii")
+
+
+def svg_box_cell(rel_path: str, name: str, data_f: str, cat: str = ""):
+    svg = clean_svg(read_svg(ROOT / rel_path))
+    tag = f' data-tag="{esc(cat)}"' if cat else ""
+    return (
+        f'<div class="cell img-cell" data-name="{esc(name)}"{tag} data-f="{data_f}">'
+        f'<div class="svgbox">{svg}</div>'
+        f'<div class="nm">{esc(name)}</div></div>'
+    )
+
+
+def png_cell(item, photo: bool = False, data_f: str = "tmpl"):
+    cls = " photo" if photo else ""
+    uri = png_uri(ROOT / item["rel"])
+    return (
+        f'<div class="cell img-cell{cls}" data-name="{esc(item["name"])}" data-f="{data_f}">'
+        f'<img src="{uri}" alt="{esc(item["name"])}">'
+        f'<div class="nm">{esc(item["name"])}</div></div>'
+    )
 
 
 def esc(s: str) -> str:
@@ -157,6 +187,8 @@ h2 small {{ color:#8A8F9C; font-size:13px; font-weight:400; margin-left:8px; }}
 .img-cell {{ padding:8px; }}
 .img-cell img {{ width:100%; height:150px; object-fit:contain; display:block; background:#fff; border-radius:8px; }}
 .img-cell.photo img {{ object-fit:cover; height:110px; }}
+.svgbox {{ height:150px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:6px; }}
+.svgbox svg {{ max-width:100%; max-height:100%; }}
 .illo-grid {{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }}
 .band-grid {{ grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }}
 .swatches {{ display:flex; gap:14px; flex-wrap:wrap; }}
@@ -246,13 +278,16 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 </section>
 """)
 
+    brand_png_html = "".join(png_cell(i, data_f="icon") for i in brand_pngs)
+    parts.append(f"""
+<section data-f="icon">
+  <h2>品牌图标 · PNG <small>{len(brand_pngs)} 张 · 透明底位图</small></h2>
+  <div class="grid band-grid">{brand_png_html}</div>
+</section>
+""")
+
     # IP 形象
-    bot_html = "".join(
-        f'<div class="cell img-cell" data-name="{esc(b["name"])}" data-f="ip">'
-        f'<img src="assets/{esc(b["rel"].replace(chr(92), "/"))}" loading="lazy" alt="{esc(b["name"])}">'
-        f'<div class="nm">{esc(b["name"])}</div></div>'
-        for b in bots
-    )
+    bot_html = "".join(svg_box_cell(b["rel"], b["name"], "ip") for b in bots)
     parts.append(f"""
 <section id="ip" data-f="ip">
   <h2>IP 形象 <small>{len(bots)} 个 · DiceBear bottts 免费商用</small></h2>
@@ -262,12 +297,7 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 """)
 
     # 插画
-    illo_html = "".join(
-        f'<div class="cell img-cell" data-name="{esc(i["name"])}" data-tag="{esc(i["cat"])}" data-f="illo">'
-        f'<img src="assets/{esc(i["rel"].replace(chr(92), "/"))}" loading="lazy" alt="{esc(i["name"])}">'
-        f'<div class="nm">{esc(i["cat"])} · {esc(i["name"])}</div></div>'
-        for i in illos
-    )
+    illo_html = "".join(svg_box_cell(i["rel"], i["name"], "illo", i["cat"]) for i in illos)
     parts.append(f"""
 <section id="illo" data-f="illo">
   <h2>科技风插画 <small>{len(illos)} 张 · unDraw 免费商用免署名</small></h2>
@@ -299,25 +329,16 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 """)
 
     # 品牌 PNG / 评论截图 / 视频模板
-    def img_grid(items, photo=False):
-        cls = "photo" if photo else ""
-        return "".join(
-            f'<div class="cell img-cell {cls}" data-name="{esc(i["name"])}">'
-            f'<img src="assets/{esc(i["rel"].replace(chr(92), "/"))}" loading="lazy" alt="{esc(i["name"])}">'
-            f'<div class="nm">{esc(i["name"])}</div></div>'
-            for i in items
-        )
-
     parts.append(f"""
 <section id="tmpl" data-f="tmpl">
   <h2>视频风格模板 <small>{len(styles)} 套 · 见模板库/视频风格样板</small></h2>
   <div class="desc">默认深空数据舱；选型规则见 assets/视频风格模板 说明。</div>
-  <div class="grid band-grid">{img_grid(styles)}</div>
+  <div class="grid band-grid">{''.join(png_cell(s) for s in styles)}</div>
 </section>
 
 <section id="comments" data-f="tmpl">
   <h2>评论截图卡片 <small>{len(comments)} 张</small></h2>
-  <div class="grid">{img_grid(comments, photo=True)}</div>
+  <div class="grid">{''.join(png_cell(c, photo=True) for c in comments)}</div>
 </section>
 
 <section id="docs">
