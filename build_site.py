@@ -101,7 +101,6 @@ def main():
         (MAT / "IP形象", ASSETS / "IP形象"),
         (MAT / "插画", ASSETS / "插画"),
         (MAT / "品牌图标", ASSETS / "品牌图标"),
-        (MAT / "评论截图卡片", ASSETS / "评论截图卡片"),
         (MAT / "字体", ASSETS / "字体"),
         (MAT / "品牌资产", ASSETS / "品牌资产"),
         (TPL / "视频风格样板", ASSETS / "视频风格模板"),
@@ -135,13 +134,12 @@ def main():
         illos.append({"name": p.stem, "cat": cat, "rel": p.relative_to(ROOT).as_posix()})
 
     brand_pngs = collect_images(MAT / "品牌图标")
-    comments = collect_images(MAT / "评论截图卡片")
     styles = collect_images(TPL / "视频风格样板")
     motions = []
     motion_media = MAT / "动效" / "video-shotcraft" / "media"
     if motion_media.exists():
         for p in sorted(motion_media.glob("*.mp4")):
-            motions.append({"name": p.stem, "rel": p.relative_to(ROOT).as_posix()})
+            motions.append({"name": p.stem, "rel": p.relative_to(MAT).as_posix()})
 
     fonts = []
     for d in sorted((MAT / "字体").iterdir()):
@@ -245,7 +243,6 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
     <div class="stat"><b>{len(illos)}</b>科技插画</div>
     <div class="stat"><b>{sum(f['count'] for f in fonts)}</b>中文字体字重</div>
     <div class="stat"><b>{len(styles)}</b>视频风格模板</div>
-    <div class="stat"><b>{len(comments)}</b>评论截图</div>
     <div class="stat"><b>{len(motions)}</b>动效</div>
   </div>
 </header>
@@ -352,18 +349,13 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 </section>
 """)
 
-    # 品牌 PNG / 评论截图 / 视频模板 / 动效
+    # 品牌 PNG / 视频模板 / 动效
     motion_html = "".join(motion_cell(m) for m in motions)
     parts.append(f"""
 <section id="tmpl" data-f="tmpl">
   <h2>视频风格模板 <small>{len(styles)} 套 · 见模板库/视频风格样板</small></h2>
   <div class="desc">默认深空数据舱；选型规则见 assets/视频风格模板 说明。</div>
   <div class="grid band-grid">{''.join(png_cell(s) for s in styles)}</div>
-</section>
-
-<section id="comments" data-f="tmpl">
-  <h2>评论截图卡片 <small>{len(comments)} 张</small></h2>
-  <div class="grid">{''.join(png_cell(c, photo=True) for c in comments)}</div>
 </section>
 
 <section id="motion" data-f="motion">
@@ -423,7 +415,7 @@ document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()
     OUT.mkdir(exist_ok=True)
     (OUT / "index.html").write_text("\n".join(parts), encoding="utf-8")
     print("OK: index.html generated")
-    print(f"icons={len(common_icons)} brand={len(brand_icons)} bots={len(bots)} illos={len(illos)} fonts={len(fonts)} styles={len(styles)} comments={len(comments)} motions={len(motions)}")
+    print(f"icons={len(common_icons)} brand={len(brand_icons)} bots={len(bots)} illos={len(illos)} fonts={len(fonts)} styles={len(styles)} motions={len(motions)}")
 
 
 if __name__ == "__main__":
