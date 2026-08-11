@@ -63,6 +63,20 @@ def esc(s: str) -> str:
     return html.escape(s, quote=True)
 
 
+def motion_cell(item):
+    poster = MAT / "动效" / "video-shotcraft" / "poster" / (item["name"] + ".jpg")
+    poster_attr = (
+        f' poster="assets/动效/video-shotcraft/poster/{item["name"]}.jpg"'
+        if poster.exists()
+        else ""
+    )
+    return (
+        f'<div class="cell vid-cell" data-name="{esc(item["name"])}" data-f="motion">'
+        f'<video controls preload="none"{poster_attr}><source src="assets/{item["rel"]}" type="video/mp4"></video>'
+        f'<div class="nm">{esc(item["name"])}</div></div>'
+    )
+
+
 def collect_icons(sub: str):
     items = []
     folder = MAT / "图标库" / sub
@@ -91,6 +105,7 @@ def main():
         (MAT / "字体", ASSETS / "字体"),
         (MAT / "品牌资产", ASSETS / "品牌资产"),
         (TPL / "视频风格样板", ASSETS / "视频风格模板"),
+        (MAT / "动效", ASSETS / "动效"),
     ]
     for src, dst in pairs:
         if src.exists():
@@ -122,6 +137,11 @@ def main():
     brand_pngs = collect_images(MAT / "品牌图标")
     comments = collect_images(MAT / "评论截图卡片")
     styles = collect_images(TPL / "视频风格样板")
+    motions = []
+    motion_media = MAT / "动效" / "video-shotcraft" / "media"
+    if motion_media.exists():
+        for p in sorted(motion_media.glob("*.mp4")):
+            motions.append({"name": p.stem, "rel": p.relative_to(ROOT).as_posix()})
 
     fonts = []
     for d in sorted((MAT / "字体").iterdir()):
@@ -187,6 +207,8 @@ h2 small {{ color:#8A8F9C; font-size:13px; font-weight:400; margin-left:8px; }}
 .img-cell {{ padding:8px; }}
 .img-cell img {{ width:100%; height:150px; object-fit:contain; display:block; background:#fff; border-radius:8px; }}
 .img-cell.photo img {{ object-fit:cover; height:110px; }}
+.vid-grid {{ grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }}
+.vid-cell video {{ width:100%; height:180px; background:#000; border-radius:8px; display:block; }}
 .svgbox {{ height:150px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:6px; }}
 .svgbox svg {{ max-width:100%; max-height:100%; }}
 .illo-grid {{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }}
@@ -224,6 +246,7 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
     <div class="stat"><b>{sum(f['count'] for f in fonts)}</b>中文字体字重</div>
     <div class="stat"><b>{len(styles)}</b>视频风格模板</div>
     <div class="stat"><b>{len(comments)}</b>评论截图</div>
+    <div class="stat"><b>{len(motions)}</b>动效</div>
   </div>
 </header>
 
@@ -236,6 +259,7 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
   <button class="chip" data-f="illo">插画</button>
   <button class="chip" data-f="font">字体</button>
   <button class="chip" data-f="tmpl">视频模板</button>
+  <button class="chip" data-f="motion">动效</button>
 </div>
 """)
 
@@ -328,7 +352,8 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 </section>
 """)
 
-    # 品牌 PNG / 评论截图 / 视频模板
+    # 品牌 PNG / 评论截图 / 视频模板 / 动效
+    motion_html = "".join(motion_cell(m) for m in motions)
     parts.append(f"""
 <section id="tmpl" data-f="tmpl">
   <h2>视频风格模板 <small>{len(styles)} 套 · 见模板库/视频风格样板</small></h2>
@@ -339,6 +364,12 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
 <section id="comments" data-f="tmpl">
   <h2>评论截图卡片 <small>{len(comments)} 张</small></h2>
   <div class="grid">{''.join(png_cell(c, photo=True) for c in comments)}</div>
+</section>
+
+<section id="motion" data-f="motion">
+  <h2>动效 <small>{len(motions)} 条 · video-shotcraft · Apache-2.0</small></h2>
+  <div class="desc">Remotion 镜头配方动效样片（每条 4–6s，可商用，需保留署名）；完整清单 / 配方文档 / 许可证见 assets/动效/video-shotcraft/</div>
+  <div class="grid vid-grid">{motion_html}</div>
 </section>
 
 <section id="docs">
@@ -362,6 +393,7 @@ td,th {{ border:1px solid rgba(255,255,255,.1); padding:8px 10px; text-align:lef
     <tr><td>科技插画</td><td>unDraw</td><td>免费商用免署名</td></tr>
     <tr><td>思源黑体/宋体</td><td>Adobe Fonts</td><td>SIL OFL 1.1</td></tr>
     <tr><td>得意黑 / JetBrains Mono</td><td>开源字体</td><td>SIL OFL</td></tr>
+    <tr><td>动效</td><td>video-shotcraft（Vincentwei1021）</td><td>Apache-2.0，保留署名</td></tr>
   </table>
   <p style="margin-top:14px">本页由 build_site.py 自动生成：新增素材 → 运行脚本 → 提交推送。&copy; leeon</p>
 </footer>
@@ -391,7 +423,7 @@ document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()
     OUT.mkdir(exist_ok=True)
     (OUT / "index.html").write_text("\n".join(parts), encoding="utf-8")
     print("OK: index.html generated")
-    print(f"icons={len(common_icons)} brand={len(brand_icons)} bots={len(bots)} illos={len(illos)} fonts={len(fonts)} styles={len(styles)} comments={len(comments)}")
+    print(f"icons={len(common_icons)} brand={len(brand_icons)} bots={len(bots)} illos={len(illos)} fonts={len(fonts)} styles={len(styles)} comments={len(comments)} motions={len(motions)}")
 
 
 if __name__ == "__main__":

@@ -9,8 +9,8 @@
 
 | 文件夹 | 内容 | 数量 |
 |---|---|---:|
-| `通用图标/` | Lucide 线性图标（AI 智能 / 科普学习 / 干货创作分享 / 工具流程） | 93 |
-| `品牌图标/` | Simple Icons 品牌 logo（OpenAI、DeepSeek、Anthropic、HuggingFace、GitHub、Google、Microsoft、NVIDIA、Meta） | 9 |
+| `通用图标/` | Lucide 线性图标（AI 智能 / 科普学习 / 干货创作分享 / 工具流程） | 96 |
+| `品牌图标/` | Simple Icons 品牌 logo（OpenAI、DeepSeek、Anthropic、HuggingFace、GitHub、Google、Microsoft、NVIDIA、Meta） | 13 |
 | `_failed/` | 下载失败的无效文件（可忽略或删除） | - |
 
 ## 许可证（都可商用）
@@ -33,4 +33,5 @@
 
 ## 更新记录
 
-- 2026-08-07：首批入库。通用图标 93 枚（Lucide v1.29.0），品牌图标 9 枚（Simple Icons）。
+- 2026-08-07：首批入库。通用图标 96 枚（Lucide 93 + 自绘 3），品牌图标 13 枚（Simple Icons）。
+- 2026-08-09：补充文件与平台类图标。品牌 +4（Microsoft Excel / Word / PowerPoint、Adobe Acrobat Reader，官方色）；通用 +3（webpage 网页、app App、file-pdf PDF 文件，自绘 Lucide 风格）。

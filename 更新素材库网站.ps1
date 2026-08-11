@@ -1,4 +1,4 @@
-# 一键更新 leeon 素材库网站：重建页面 + 同步资源 + 提交推送
+﻿# 一键更新 leeon 素材库网站：重建页面 + 同步资源 + 提交推送
 $ErrorActionPreference = "Stop"
 $site = "D:\AI\codex\projects\leeon账号运营\leeon\素材库网站"
 
